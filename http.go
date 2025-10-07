@@ -292,6 +292,14 @@ func httpWriteUpgradeRequest(
 	bw.WriteString(u.RequestURI())
 	bw.WriteString(" HTTP/1.1\r\n")
 
+	if httpHandshakeHeader, isHTTP := header.(HandshakeHeaderHTTP); isHTTP {
+		httpHeader := http.Header(httpHandshakeHeader)
+		if customHost := httpHeader.Get("Host"); customHost != "" {
+			host = customHost
+			httpHeader.Del("Host")
+		}
+	}
+	
 	if host == "" {
 		host = u.Host
 	}
